@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block head %}
+  <title>WebSocket Flask Client</title>
+	<style>
+        .circle {
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+            border-radius: 50%;
+						display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+<div class='container m-2'>
+		<div class="row">
+			<h1>Send a message to the WebSocket Server</h1>
+		</div>
+		<div class="row">
+			<input type="text" class="form-control" id="message" placeholder="Type your message" required>
+		</div>
+		<div class="row m-5">
+			<button type='button' class='btn btn-warning btn-lg mt-1' onclick="sendMessage()" >send</button>
+		</div>
+</div>
+
+<script>
+    function sendMessage() {
+        const message = document.getElementById('message').value;
+        const websocket = new WebSocket('wss://smart-led-server.onrender.com')
+
+        websocket.onopen = function() {
+            websocket.send(message);
+            console.log('Message sent to WebSocket server:', message);
+        };
+
+        websocket.onmessage = function(event) {
+            const response = event.data;
+            console.log('Received from WebSocket server:', response);
+            websocket.close();
+        };
+    }
+</script>
+
+{% endblock %}
