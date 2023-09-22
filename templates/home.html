@@ -3,49 +3,64 @@
 
 {% block head %}
   <title>WebSocket Flask Client</title>
-	<style>
-        .circle {
-            width: 100px;
-            height: 100px;
-            background-color: blue;
-            border-radius: 50%;
-						display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
+  <style>
+    .circle {
+      width: 100px;
+      height: 100px;
+      background-color: blue;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
 {% endblock %}
 
 {% block body %}
 
 <div class='container m-2'>
-		<div class="row">
-			<h1>Send a message to the WebSocket Server</h1>
-		</div>
-		<div class="row">
-			<input type="text" class="form-control" id="message" placeholder="Type your message" required>
-		</div>
-		<div class="row m-5">
-			<button type='button' class='btn btn-warning btn-lg mt-1' onclick="sendMessage()" >send</button>
-		</div>
+  <div class="row">
+    <h1>Send a message to the WebSocket Server</h1>
+  </div>
+  <div class="row">
+    <!-- Use a textarea for multiline input -->
+    <textarea class="form-control" id="message" placeholder="Type your message" required></textarea>
+  </div>
+  <div class="row m-5">
+    <button type='button' class='btn btn-warning btn-lg mt-1' onclick="sendMessage()" >send</button>
+  </div>
 </div>
 
 <script>
-    function sendMessage() {
-        const message = document.getElementById('message').value;
-        const websocket = new WebSocket('wss://smart-led-server.onrender.com')
+  function sendMessage() {
+    const message = document.getElementById('message').value;
+    const websocket = new WebSocket('wss://smart-led-server.onrender.com')
 
-        websocket.onopen = function() {
-            websocket.send(message);
-            console.log('Message sent to WebSocket server:', message);
-        };
+    websocket.onopen = function() {
+      websocket.send(message);
+      console.log('Message sent to WebSocket server:', message);
+    };
 
-        websocket.onmessage = function(event) {
-            const response = event.data;
-            console.log('Received from WebSocket server:', response);
-            websocket.close();
-        };
+    websocket.onmessage = function(event) {
+      const response = event.data;
+      console.log('Received from WebSocket server:', response);
+      websocket.close();
+    };
+  }
+
+  // Listen for Enter key press to insert a newline
+  document.getElementById('message').addEventListener('keydown', function(e) {
+    if (e.keyCode === 13 && e.shiftKey === false) {
+      e.preventDefault(); // Prevent the default Enter behavior (submitting the form)
+      const textarea = document.getElementById('message');
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const text = textarea.value;
+      const newText = text.substring(0, start) + '\n' + text.substring(end);
+      textarea.value = newText;
     }
+  });
 </script>
 
 {% endblock %}
+
