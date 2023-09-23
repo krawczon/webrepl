@@ -13,11 +13,17 @@
       justify-content: center;
       align-items: center;
     }
+
+    /* Add some CSS to style the label */
+    .message-label {
+      width: 100%;
+      margin-top: 10px;
+      font-weight: bold;
+    }
   </style>
 {% endblock %}
 
 {% block body %}
-
 <div class='container m-2'>
   <div class="row">
     <h1>Send a message to the WebSocket Server</h1>
@@ -27,7 +33,11 @@
     <textarea class="form-control" id="message" placeholder="Type your message" required></textarea>
   </div>
   <div class="row m-5">
-    <button type='button' class='btn btn-warning btn-lg mt-1' onclick="sendMessage()" >send</button>
+    <button type='button' class='btn btn-warning btn-lg mt-1' onclick="sendMessage()">Send</button>
+  </div>
+  <!-- Add the label below the button to display received messages -->
+  <div class="row">
+    <label class="message-label" id="messageLabel"></label>
   </div>
 </div>
 
@@ -44,6 +54,24 @@
     websocket.onmessage = function(event) {
       const response = event.data;
       console.log('Received from WebSocket server:', response);
+      
+      // Try to parse the response as JSON
+      try {
+        const list = JSON.parse(response);
+        
+        // Display each element of the received list below the next one
+        const messageLabel = document.getElementById('messageLabel');
+        list.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.textContent = item;
+          messageLabel.appendChild(itemElement);
+        });
+      } catch (e) {
+        // If parsing as JSON fails, display the response as is
+        const messageLabel = document.getElementById('messageLabel');
+        messageLabel.textContent = response;
+      }
+
       websocket.close();
     };
   }
